@@ -49,7 +49,7 @@ class Blowfish implements \CryptLib\Password\Password {
      * @return boolean Was the hash created by this method
      */
     public static function detect($hash) {
-        static $regex = '/^\$2a\$(0[4-9]|[1-2][0-9]|3[0-1])\$[a-zA-Z0-9.\/]{53}/';
+        static $regex = '/^\$2[ay]\$(0[4-9]|[1-2][0-9]|3[0-1])\$[a-zA-Z0-9.\/]{53}/';
         return 1 == preg_match($regex, $hash);
     }
 
@@ -59,7 +59,11 @@ class Blowfish implements \CryptLib\Password\Password {
      * @return string The prefix used
      */
     public static function getPrefix() {
-        return '$2a$';
+        if (version_compare(PHP_VERSION, '5.3.7') >= 0) {
+            return '$2y$';
+        } else {
+            return '$2a$';
+        }    
     }
 
     /**
@@ -109,8 +113,18 @@ class Blowfish implements \CryptLib\Password\Password {
      * @return string The formatted password hash
      */
     public function create($password) {
+        /**
+         * Check for security flaw in the bcrypt implementation used by crypt()
+         * @see http://php.net/security/crypt_blowfish.php
+         */ 
+        if (version_compare(PHP_VERSION, '5.3.7', '<') && preg_match('/[\x80-\xFF]/', $password)) {
+            throw new \RuntimeException(
+                'The bcrypt implementation used by PHP contains a security flaw for password with 8-bit character. ' .
+                'We suggest to upgrade to PHP 5.3.7+ or use passwords with only 7-bit characters'
+            );
+        }
         $salt       = $this->to64($this->generator->generate(16));
-        $prefix     = '$2a$' . str_pad($this->iterations, 2, '0', STR_PAD_LEFT);
+        $prefix     = self::getPrefix() . str_pad($this->iterations, 2, '0', STR_PAD_LEFT);
         $saltstring = $prefix . '$' . $salt;
         $result     = crypt($password, $saltstring);
         if ($result[0] == '*') {
