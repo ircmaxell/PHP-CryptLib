@@ -195,7 +195,8 @@ class Vectors_Random_GeneratorTest extends PHPUnit_Framework_TestCase {
         $on = 0;
         for ($i = 0; $i < $times; $i++) {
             $byte = $generator->generate(2);
-            $byte = array_shift(unpack('n', $byte));
+            $byte = unpack('n', $byte);
+            $byte = array_shift($byte);
             $xCoord = ($byte >> 8);
             $yCoord = ($byte & 0xFF);
             if ($xCoord < $yCoord) {
