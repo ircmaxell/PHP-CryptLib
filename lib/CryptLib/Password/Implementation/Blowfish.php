@@ -120,9 +120,9 @@ class Blowfish implements \CryptLib\Password\Password {
         $match = preg_match('/[\x80-\xFF]/', $password);
         if (version_compare(PHP_VERSION, '5.3.7', '<') && $match) {
             throw new \RuntimeException(
-                'The bcrypt implementation used by PHP contains a security flaw for ' .
-                'password with 8-bit character. We suggest to upgrade to PHP 5.3.7+ ' .
-                'or use passwords with only 7-bit characters'
+                'The bcrypt implementation used by PHP contains a security flaw ' .
+                'for password with 8-bit character. We suggest to upgrade to ' .
+                'PHP 5.3.7+ or use passwords with only 7-bit characters'
             );
         }
         $salt       = $this->to64($this->generator->generate(16));
