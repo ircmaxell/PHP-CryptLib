@@ -63,7 +63,7 @@ class Blowfish implements \CryptLib\Password\Password {
             return '$2y$';
         } else {
             return '$2a$';
-        }    
+        }
     }
 
     /**
@@ -116,15 +116,18 @@ class Blowfish implements \CryptLib\Password\Password {
         /**
          * Check for security flaw in the bcrypt implementation used by crypt()
          * @see http://php.net/security/crypt_blowfish.php
-         */ 
-        if (version_compare(PHP_VERSION, '5.3.7', '<') && preg_match('/[\x80-\xFF]/', $password)) {
+         */
+        $match = preg_match('/[\x80-\xFF]/', $password);
+        if (version_compare(PHP_VERSION, '5.3.7', '<') && $match) {
             throw new \RuntimeException(
-                'The bcrypt implementation used by PHP contains a security flaw for password with 8-bit character. ' .
-                'We suggest to upgrade to PHP 5.3.7+ or use passwords with only 7-bit characters'
+                'The bcrypt implementation used by PHP contains a security flaw for ' .
+                'password with 8-bit character. We suggest to upgrade to PHP 5.3.7+ ' .
+                'or use passwords with only 7-bit characters'
             );
         }
         $salt       = $this->to64($this->generator->generate(16));
-        $prefix     = self::getPrefix() . str_pad($this->iterations, 2, '0', STR_PAD_LEFT);
+        $prefix     = static::getPrefix();
+        $prefix    .= str_pad($this->iterations, 2, '0', STR_PAD_LEFT);
         $saltstring = $prefix . '$' . $salt;
         $result     = crypt($password, $saltstring);
         if ($result[0] == '*') {
