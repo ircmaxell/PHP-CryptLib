@@ -1,5 +1,7 @@
 #PHP-CryptLib
 
+[![Build Status](https://travis-ci.org/ircmaxell/PHP-CryptLib.png?branch=master)](https://travis-ci.org/ircmaxell/PHP-CryptLib)
+
 ##Version
 
 The current version is considered Alpha.  This means that it is *ready enough* to start testing and vetting the library, but not feature complete and not production ready.
