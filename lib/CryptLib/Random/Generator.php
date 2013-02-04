@@ -154,7 +154,7 @@ class Generator {
                           'ABCDEFGHIJKLMNOPQRSTUVWXYZ./';
         }
         //determine how many bytes to generate
-        $bytes  = ceil($length * floor(log(strlen($characters), 2) + 1) / 8);
+        $bytes  = ceil($length * floor(log(strlen($characters), 2) + 1.01) / 8);
         $rand   = $this->generate($bytes);
         $result = BaseConverter::convertFromBinary($rand, $characters);
         if (strlen($result) < $length) {
